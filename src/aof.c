@@ -821,7 +821,6 @@ void backgroundRewriteDoneHandler(int statloc) {
         int newfd, oldfd;
         int nwritten;
         char tmpfile[256];
-        long long now = ustime();
 
         redisLog(REDIS_NOTICE,
             "Background AOF rewrite terminated with success");
