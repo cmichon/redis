@@ -192,8 +192,6 @@ void sendBulkToSlave(aeEventLoop *el, int fd, void *privdata, int mask) {
     }
 
     if ((nwritten = send((SOCKET)fd,buf,(int)buflen,0)) == SOCKET_ERROR) {
-        redisLog(REDIS_VERBOSE,"Write error sending DB to slave: %s",
-            strerror(errno));
         freeClient(slave);
         return;
     }
@@ -250,8 +248,6 @@ void sendBulkToSlave(aeEventLoop *el, int fd, void *privdata, int mask) {
     }
 
     if ((nwritten = write(fd,buf,buflen)) == -1) {
-        redisLog(REDIS_VERBOSE,"Write error sending DB to slave: %s",
-            strerror(errno));
         freeClient(slave);
         return;
     }

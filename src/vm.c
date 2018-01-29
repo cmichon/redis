@@ -111,8 +111,6 @@ void vmInit(void) {
         redisLog(REDIS_NOTICE,"Swap file allocated with success");
     }
     server.vm_bitmap = zcalloc((server.vm_pages+7)/8);
-    redisLog(REDIS_VERBOSE,"Allocated %lld bytes page table for %lld pages",
-        (long long) (server.vm_pages+7)/8, server.vm_pages);
 
     /* Initialize threaded I/O (used by Virtual Memory) */
     server.io_newjobs = listCreate();

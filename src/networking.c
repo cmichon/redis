@@ -508,7 +508,6 @@ void acceptTcpHandler(aeEventLoop *el, int fd, void *privdata, int mask) {
         redisLog(REDIS_WARNING,"Accepting client connection: %s", server.neterr);
         return;
     }
-    redisLog(REDIS_VERBOSE,"Accepted %s:%d", cip, cport);
     acceptCommonHandler(cfd);
 }
 
@@ -523,7 +522,6 @@ void acceptUnixHandler(aeEventLoop *el, int fd, void *privdata, int mask) {
         redisLog(REDIS_WARNING,"Accepting client connection: %s", server.neterr);
         return;
     }
-    redisLog(REDIS_VERBOSE,"Accepted connection to %s", server.unixsocket);
     acceptCommonHandler(cfd);
 }
 
@@ -718,8 +716,6 @@ void sendReplyToClient(aeEventLoop *el, int fd, void *privdata, int mask) {
         if (errno == EAGAIN) {
             nwritten = 0;
         } else {
-            redisLog(REDIS_VERBOSE,
-                "Error writing to client: %s", strerror(errno));
             freeClient(c);
             return;
         }
@@ -759,7 +755,6 @@ void closeTimedoutClients(void) {
             listLength(c->pubsub_patterns) == 0 &&
             (now - c->lastinteraction > server.maxidletime))
         {
-            redisLog(REDIS_VERBOSE,"Closing idle client");
             freeClient(c);
         } else if (c->flags & REDIS_BLOCKED) {
             if (c->bpop.timeout != 0 && c->bpop.timeout < now) {
@@ -814,8 +809,6 @@ int processInlineBuffer(redisClient *c) {
 static void setProtocolError(redisClient *c, int pos) {
     if (server.verbosity >= REDIS_VERBOSE) {
         sds client = getClientInfoString(c);
-        redisLog(REDIS_VERBOSE,
-            "Protocol error from client: %s", client);
         sdsfree(client);
     }
     c->flags |= REDIS_CLOSE_AFTER_REPLY;
@@ -979,7 +972,6 @@ void readQueryFromClient(aeEventLoop *el, int fd, void *privdata, int mask) {
         errno = WSAGetLastError();
         if (errno == WSAECONNRESET) {
             /* Windows fix: Not an error, intercept it.  */
-            redisLog(REDIS_VERBOSE, "Client closed connection");
             freeClient(c);
             return;
         } else if ((errno == ENOENT) || (errno == WSAEWOULDBLOCK)) {
@@ -995,12 +987,10 @@ void readQueryFromClient(aeEventLoop *el, int fd, void *privdata, int mask) {
         if (errno == EAGAIN) {
             nread = 0;
         } else {
-            redisLog(REDIS_VERBOSE, "Reading from client: %s",strerror(errno));
             freeClient(c);
             return;
         }
     } else if (nread == 0) {
-        redisLog(REDIS_VERBOSE, "Client closed connection");
         freeClient(c);
         return;
     }

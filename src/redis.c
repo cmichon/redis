@@ -600,7 +600,6 @@ int serverCron(struct aeEventLoop *eventLoop, long long id, void *clientData) {
         used = dictSize(server.db[j].dict);
         vkeys = dictSize(server.db[j].expires);
         if (!(loops % 50) && (used || vkeys)) {
-            redisLog(REDIS_VERBOSE,"DB %d: %lld keys (%lld volatile) in %lld slots HT.",j,used,vkeys,size);
             /* dictPrintStats(server.dict); */
         }
     }
@@ -614,22 +613,6 @@ int serverCron(struct aeEventLoop *eventLoop, long long id, void *clientData) {
     if (server.bgsavechildpid == -1 && server.bgrewritechildpid == -1) {
         if (!(loops % 10)) tryResizeHashTables();
         if (server.activerehashing) incrementallyRehash();
-    }
-
-    /* Show information about connected clients */
-    if (!(loops % 50)) {
-#ifdef _WIN32
-        redisLog(REDIS_VERBOSE,"%d clients connected (%d slaves), %llu bytes in use",
-            listLength(server.clients)-listLength(server.slaves),
-            listLength(server.slaves),
-            (unsigned long long)zmalloc_used_memory()
-#else
-        redisLog(REDIS_VERBOSE,"%d clients connected (%d slaves), %zu bytes in use",
-            listLength(server.clients)-listLength(server.slaves),
-            listLength(server.slaves),
-            zmalloc_used_memory()
-#endif
-        );
     }
 
     /* Close connections of timedout clients */

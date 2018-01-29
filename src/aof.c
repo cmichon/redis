@@ -952,8 +952,6 @@ void backgroundRewriteDoneHandler(int statloc) {
         if (oldfd != -1) bioCreateBackgroundJob(REDIS_BIO_CLOSE_FILE,(void*)(long)oldfd,NULL,NULL);
 #endif
 
-        redisLog(REDIS_VERBOSE,
-            "Background AOF rewrite signal handler took %lldus", ustime()-now);
     } else if (!bysignal && exitcode != 0) {
         redisLog(REDIS_WARNING,
             "Background AOF rewrite terminated with error");
